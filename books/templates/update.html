@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>Update</h1>
+
+{% if error_book_not_found %}
+    <h1>{{ error_book_not_found }}</h1>
+{% else %}
+    <form method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Save Book">
+    </form>
+{% endif %}
+
+{% endblock %}
