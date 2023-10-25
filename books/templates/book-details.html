@@ -17,4 +17,6 @@
     <p>{{ object.description }}</p>
 {% endif %}
 
+<a href="{% url 'books:update' book.id %}">Update</a>
+<a href="{% url 'books:delete' book.id %}">Delete</a>
 {% endblock %}

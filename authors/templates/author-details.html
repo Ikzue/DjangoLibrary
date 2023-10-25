@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{ object.first_name }} {{ object.middle_name }} {{ object.last_name }}</h1>
+<p>Country: {{ object.country }}</p>
+<p>Birth Date: {{ object.birth_date }}</p>
+
+<a href="{% url 'authors:update' object.id %}">Update</a>
+<a href="{% url 'authors:delete' object.id %}">Delete</a>
+{% endblock %}

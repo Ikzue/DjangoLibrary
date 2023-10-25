@@ -9,3 +9,6 @@ class Book(models.Model):
     isbn = models.CharField(max_length=17)
     release_date = models.DateField()
     description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Book {self.id} - Title:{self.title}"

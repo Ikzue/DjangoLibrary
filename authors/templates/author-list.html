@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+<a href="{% url 'authors:create' %}">Create New Author</a>
+<ul>
+{% for author in object_list %}
+    <li><a href="{% url 'authors:details' author.id %}">{{ author.first_name }} {{ author.last_name }}</a></li> 
+{% endfor %}
+</ul>
+
+{% endblock %}

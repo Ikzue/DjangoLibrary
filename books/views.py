@@ -1,52 +1,47 @@
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, FormView, UpdateView, DeleteView
-from django.http import HttpResponse
+from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, FormView, DeleteView
 # Create your views here.
 from .models import Book
 from .forms import BookForm
 
 class BookListView(ListView):
-    template_name = "list.html"
+    template_name = "book-list.html"
     queryset = Book.objects.all()
-    extra_context={"title": "Custom Title"}
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = "Book List"
-        return context
 
 class BookDetailView(DetailView):
-    template_name = "details.html"
+    template_name = "book-details.html"
     model = Book
 
 
 class BookCreateView(FormView):
-    template_name = "create.html"
+    template_name = "book-create.html"
     form_class = BookForm
 
     def form_valid(self, form):
         book = form.save()
-        return redirect('book-details', pk=book.id)     
-
+        return redirect('books:details', pk=book.id)     
 
 class BookUpdateView(FormView):
-    template_name = "update.html"
+    template_name = "book-update.html"
     form_class = BookForm
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  # GET
         if "form" not in kwargs:
-            try:
-                book = Book.objects.get(id=self.kwargs["pk"])
-                kwargs["form"] = self.form_class(instance=book)
-            except Book.DoesNotExist:
-                kwargs["error_book_not_found"] = f"Book {self.kwargs['pk']} does not exist"
+            book = get_object_or_404(Book, pk=self.kwargs["pk"])
+            kwargs["form"] = self.form_class(instance=book)
         return super().get_context_data(**kwargs)
 
-    def form_valid(self, form):
-        book = form.save()
-        return redirect('book-details', pk=book.id) 
+    def post(self, request, *args, **kwargs):  # POST
+        book = get_object_or_404(Book, pk=self.kwargs["pk"])
+        form = self.form_class(request.POST, instance=book)
+        if form.is_valid():
+            book = form.save()
+            return redirect('books:details', pk=book.id) 
+        return render(request, self.template_name, {'form': form})
 
 
 class BookDeleteView(DeleteView):
-    template_name = "delete.html"
+    template_name = "book-delete.html"
     model = Book
+    success_url = reverse_lazy('books:list')   
