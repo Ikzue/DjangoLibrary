@@ -3,7 +3,7 @@
 {% block content %}
 
 <h1>{{ object.first_name }} {{ object.middle_name }} {{ object.last_name }}</h1>
-<p>Country: {{ object.country }}</p>
+<p>Country: {{ object.country.name }}</p>
 <p>Birth Date: {{ object.birth_date }}</p>
 
 <a href="{% url 'authors:update' object.id %}">Update</a>

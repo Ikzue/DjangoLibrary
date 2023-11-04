@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,8 +6,15 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/theme.css' %}">
 </head>
 <body>
+    <nav>
+        <ul>
+            <li class="nav-li"><a href="{% url 'books:list' %}">Books</a></li>
+            <li class="nav-li"><a href="{% url 'authors:list' %}">Authors</a></li>
+        </ul>
+    </nav>
     {% block content %}
 
     {% endblock %}
