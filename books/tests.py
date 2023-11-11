@@ -54,7 +54,7 @@ def book_factory(db, author_factory):
 
 
 class TestCreate():
-    def test_create_get(self, db, client):
+    def test_get(self, db, client):
         response = client.get(reverse('books:create'))
         form = response.context_data['form']
         assert isinstance(form, BookForm)
@@ -96,7 +96,7 @@ class TestCreate():
 
 
 class TestRead():
-    def test_list(db, book_factory, client):
+    def test_list(self, db, client, book_factory):
         b1 = book_factory()
         b2 = book_factory()
         response = client.get(reverse("books:list"))
@@ -104,3 +104,70 @@ class TestRead():
         
         assert b1 == books[0]
         assert b2  == books[1]
+
+    def test_details(self, db, client, book_factory):
+        b1 = book_factory()
+        response = client.get(reverse("books:details", args=[b1.id]))
+        book = response.context_data['object']
+        assert b1 == book
+
+class TestUpdate():
+
+    def test_get(self, db, client, book_factory,):
+        book = book_factory()
+        response = client.get(reverse('books:update', args=[book.id]))
+        form = response.context_data['form']
+        assert isinstance(form, BookForm)
+
+    def test_post_empty_KO(self, db, client, book_factory):
+        book = book_factory()
+        response = client.post(reverse('books:update', args=[book.id]), {})
+        form = response.context['form']
+        assert not form.is_valid()
+        assert form.errors.keys() ==  {'author', 'title', 'isbn', 'release_date'} 
+
+    def test_post_invalid_date_KO(self, db, client, book_factory, author_factory):
+        book = book_factory()
+        author = author_factory()
+        data = {
+            "author": author.id,
+            "title": random_field(N*2),
+            "isbn": random_field(17),
+            "release_date": "32/01/2023"
+        }
+        response = client.post(reverse('books:update', args=[book.id]), data)
+        form = response.context['form']
+        assert not form.is_valid()
+        assert form.errors.keys() ==  {'release_date'}
+        assert form.errors['release_date'] == ['Enter a valid date.'] 
+
+    def test_post_valid(self, db, client, book_factory, author_factory):
+        book = book_factory()
+        author = author_factory()
+        new_title = random_field(N*2)
+        data = {
+            "author": author.id,
+            "title": new_title,
+            "isbn": random_field(17),
+            "release_date": "31/01/2023"
+        }
+        response = client.post(reverse('books:update', args=[book.id]), data)
+        book.refresh_from_db()
+        assert response.status_code == 302
+        assert response.url == reverse('books:details', args=[book.id])
+        assert book.title == new_title
+
+class TestDelete():
+    def test_get(self, db, client, book_factory):
+        book = book_factory()
+        response = client.get(reverse('books:delete', args=[book.id]))
+        confirm_msg = f'Are you sure you want to delete "{book.title}"?'
+        assert confirm_msg in response.rendered_content
+
+    def test_post(self, db, client, book_factory):
+        book = book_factory()
+        nb_books = Book.objects.count()
+        response = client.post(reverse('books:delete', args=[book.id]))
+        assert response.status_code == 302
+        assert response.url == reverse('books:list')
+        assert Book.objects.count() == nb_books - 1
