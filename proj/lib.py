@@ -8,12 +8,12 @@ class CustomDateField(forms.DateField):
         for fmt in ('%d.%m.%Y', '%d/%m/%Y', '%d-%m-%Y'):
             try:
                 return datetime.strptime(value, fmt)
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
         return super().to_python(value)
     
 def random_field(N):
-    chars = string.ascii_letters + string.digits + string.whitespace
+    chars = string.ascii_letters + string.digits + ' '
     return "".join(random.choices(chars, k=N))
 
 def random_date():
