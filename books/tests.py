@@ -1,14 +1,14 @@
 import pytest
 import random
-from typing import List, Optional
+from pprint import pprint
+
+from django.urls import reverse
+from django_countries.fields import countries
 from .models import Book
 from .forms import BookForm
 from authors.models import Author
+
 from proj.lib import random_field, random_date
-from django_countries.fields import countries
-from django.test import TestCase
-from django.urls import reverse
-from pprint import pprint
 
 N = 20
 

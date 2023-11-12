@@ -4,7 +4,7 @@
 <h1>Delete Book</h1>
 <form method="post">{% csrf_token %}
     <p>Are you sure you want to delete "{{ object.title }}"?</p>
-    {{ form.as_div }}
+    {{ form.as_p }}
     <input type="submit" value="Confirm">
 </form>
 {% endblock %}

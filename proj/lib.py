@@ -14,10 +14,10 @@ class CustomDateField(forms.DateField):
     
 def random_field(N):
     chars = string.ascii_letters + string.digits + ' '
-    return "".join(random.choices(chars, k=N))
+    return "".join(random.choices(chars, k=N)).strip()
 
 def random_date():
     return datetime.strptime(
-        f"{random.randint(1,12)}/{random.randint(1,28)}/{random.randint(1900, 2023)}",
-        "%m/%d/%Y"
+        f"{random.randint(1,28)}/{random.randint(1,12)}/{random.randint(1900, 2023)}",
+        "%d/%m/%Y"
     )
