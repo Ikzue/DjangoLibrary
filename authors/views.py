@@ -1,21 +1,25 @@
+from django.http import HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy
-from django.http import HttpResponse
-from django.views.generic import ListView, DetailView, FormView, DeleteView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, DetailView, FormView, DeleteView
 from django.db.models import ProtectedError
-# Create your views here.
+
 from .models import Author
 from .forms import AuthorForm
+
+
 class AuthorListView(ListView):
     template_name = "author-list.html"
     queryset = Author.objects.all()
+
 
 class AuthorDetailView(DetailView):
     template_name = "author-details.html"
     model = Author
 
 
-class AuthorCreateView(FormView):
+class AuthorCreateView(LoginRequiredMixin, FormView):
     template_name = "author-create.html"
     form_class = AuthorForm
 
@@ -24,7 +28,7 @@ class AuthorCreateView(FormView):
         return redirect('authors:details', pk=author.id)    
 
 
-class AuthorUpdateView(FormView):
+class AuthorUpdateView(LoginRequiredMixin, FormView):
     template_name = "author-update.html"
     form_class = AuthorForm
 
@@ -43,7 +47,7 @@ class AuthorUpdateView(FormView):
         return render(request, self.template_name, {'form': form})
 
 
-class AuthorDeleteView(DeleteView):
+class AuthorDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "author-delete.html"
     model = Author
     success_url = reverse_lazy('authors:list')   

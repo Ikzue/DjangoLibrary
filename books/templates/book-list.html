@@ -1,12 +1,81 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ title }}</h1>
-<a href="{% url 'books:create' %}">Create New Book</a>
-<ul>
-{% for book in object_list %}
-    <li><a href="{% url 'books:details' book.id %}">{{ book.title }}</a></li> 
-{% endfor %}
-</ul>
+<div class="container text-center">
 
+    <h1>{{ title }}</h1>
+    <div class="row">
+        <a href="{% url 'books:create' %}">Create New Book</a>
+    </div>
+
+    <table id="myTable" class="display">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>ISBN</th>
+                <th>Author</th>
+                <th>Co-Authors</th>
+                <th>Release Date</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in object_list %}
+            <tr>
+                <td><a href="{% url 'books:details' book.id %}">{{ book.title }}</a></td>
+                <td>{{ book.isbn }}</td>
+                <td>{{ book.author }}</td>
+                <td>{% for author in book.co_authors.all %}
+                    {{ author  }} <br>
+                    {% endfor %}</td>
+                <td>{{ book.release_date }}</td>
+                <td>{{ book.description }}</td>
+            </tr>
+            {% endfor %}
+
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Title</th>
+                <th>ISBN</th>
+                <th>Author</th>
+                <th>Co-Authors</th>
+                <th>Release Date</th>
+                <th>Description</th>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+{% endblock %}
+
+
+
+{% block js %}
+<script>
+
+$(document).ready( function () {
+    $('#myTable').DataTable({
+        "initComplete":  function () {
+        this.api()
+            .columns()
+            .every(function () {
+                let column = this;
+                let title = column.footer().textContent;
+ 
+                // Create input element
+                let input = document.createElement('input');
+                input.placeholder = title;
+                column.footer().replaceChildren(input);
+ 
+                // Event listener for user input
+                input.addEventListener('keyup', () => {
+                    if (column.search() !== this.value) {
+                        column.search(input.value).draw();
+                    }
+                });
+            });
+    }
+    });
+} );
+</script>
 {% endblock %}

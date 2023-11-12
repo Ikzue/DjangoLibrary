@@ -41,8 +41,9 @@ INSTALLED_APPS = [
     'django_countries',
     'django_extensions',
     # Site Apps
-    'books',
+    'accounts',
     'authors',
+    'books',
 ]
 
 MIDDLEWARE = [

@@ -4,10 +4,11 @@ from pprint import pprint
 
 from django.urls import reverse
 from django_countries.fields import countries
+
+from django.contrib.auth.models import User
 from .models import Book
 from .forms import BookForm
 from authors.models import Author
-
 from proj.lib import random_field, random_date
 
 N = 20
@@ -53,19 +54,26 @@ def book_factory(db, author_factory):
     return create_book
 
 
+@pytest.fixture
+def user(db):
+    return User.objects.create_user("username", "username@domain.com", "pw")
+
 class TestCreate():
-    def test_get(self, db, client):
+    def test_get(self, db, client, user):
+        client.force_login(user)
         response = client.get(reverse('books:create'))
         form = response.context_data['form']
         assert isinstance(form, BookForm)
 
-    def test_post_empty_KO(self, db, client):
+    def test_post_empty_KO(self, db, client, user):
+        client.force_login(user)
         response = client.post(reverse('books:create'), {})
         form = response.context_data['form']
         assert not form.is_valid()
         assert form.errors.keys() ==  {'author', 'title', 'isbn', 'release_date'} 
 
-    def test_post_invalid_date_KO(self, db, client, author_factory):
+    def test_post_invalid_date_KO(self, db, client, user, author_factory):
+        client.force_login(user)
         author = author_factory()
         data = {
             "author": author.id,
@@ -79,7 +87,8 @@ class TestCreate():
         assert form.errors.keys() ==  {'release_date'}
         assert form.errors['release_date'] == ['Enter a valid date.'] 
 
-    def test_post_valid(self, db, client, author_factory):
+    def test_post_valid(self, db, client, user, author_factory):
+        client.force_login(user)
         author = author_factory()
         title = random_field(N*2)
         data = {
@@ -113,20 +122,23 @@ class TestRead():
 
 class TestUpdate():
 
-    def test_get(self, db, client, book_factory,):
+    def test_get(self, db, client, user, book_factory,):
+        client.force_login(user)
         book = book_factory()
         response = client.get(reverse('books:update', args=[book.id]))
         form = response.context_data['form']
         assert isinstance(form, BookForm)
 
-    def test_post_empty_KO(self, db, client, book_factory):
+    def test_post_empty_KO(self, db, client, user, book_factory):
+        client.force_login(user)
         book = book_factory()
         response = client.post(reverse('books:update', args=[book.id]), {})
         form = response.context['form']
         assert not form.is_valid()
         assert form.errors.keys() ==  {'author', 'title', 'isbn', 'release_date'} 
 
-    def test_post_invalid_date_KO(self, db, client, book_factory, author_factory):
+    def test_post_invalid_date_KO(self, db, client, user, book_factory, author_factory):
+        client.force_login(user)
         book = book_factory()
         author = author_factory()
         data = {
@@ -141,7 +153,8 @@ class TestUpdate():
         assert form.errors.keys() ==  {'release_date'}
         assert form.errors['release_date'] == ['Enter a valid date.'] 
 
-    def test_post_valid(self, db, client, book_factory, author_factory):
+    def test_post_valid(self, db, client, user, book_factory, author_factory):
+        client.force_login(user)
         book = book_factory()
         author = author_factory()
         new_title = random_field(N*2)
@@ -158,13 +171,15 @@ class TestUpdate():
         assert book.title == new_title
 
 class TestDelete():
-    def test_get(self, db, client, book_factory):
+    def test_get(self, db, client, user, book_factory):
+        client.force_login(user)
         book = book_factory()
         response = client.get(reverse('books:delete', args=[book.id]))
         confirm_msg = f'Are you sure you want to delete "{book.title}"?'
         assert confirm_msg in response.rendered_content
 
-    def test_post(self, db, client, book_factory):
+    def test_post(self, db, client, user, book_factory):
+        client.force_login(user)
         book = book_factory()
         nb_books = Book.objects.count()
         response = client.post(reverse('books:delete', args=[book.id]))

@@ -1,20 +1,23 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, FormView, DeleteView
-# Create your views here.
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .models import Book
 from .forms import BookForm
+
 
 class BookListView(ListView):
     template_name = "book-list.html"
     queryset = Book.objects.all()
+
 
 class BookDetailView(DetailView):
     template_name = "book-details.html"
     model = Book
 
 
-class BookCreateView(FormView):
+class BookCreateView(LoginRequiredMixin, FormView):
     template_name = "book-create.html"
     form_class = BookForm
 
@@ -22,7 +25,8 @@ class BookCreateView(FormView):
         book = form.save()
         return redirect('books:details', pk=book.id)     
 
-class BookUpdateView(FormView):
+
+class BookUpdateView(LoginRequiredMixin, FormView):
     template_name = "book-update.html"
     form_class = BookForm
 
@@ -41,7 +45,7 @@ class BookUpdateView(FormView):
         return render(request, self.template_name, {'form': form})
 
 
-class BookDeleteView(DeleteView):
+class BookDeleteView(LoginRequiredMixin, DeleteView):
     template_name = "book-delete.html"
     model = Book
     success_url = reverse_lazy('books:list')   

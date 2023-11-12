@@ -20,7 +20,7 @@ from books.views import BookListView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    #path('1/',list_view),
+    path('accounts/', include('accounts.urls')),
     path('authors/', include('authors.urls')),
     path('books/', include('books.urls'),),
     path('', BookListView.as_view())

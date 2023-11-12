@@ -1,12 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ title }}</h1>
-<a href="{% url 'authors:create' %}">Create New Author</a>
-<ul>
-{% for author in object_list %}
-    <li><a href="{% url 'authors:details' author.id %}">{{ author.first_name }} {{ author.last_name }}</a></li> 
-{% endfor %}
-</ul>
+<div class="container text-center">
 
-{% endblock %}
+    <h1>{{ title }}</h1>
+    <a href="{% url 'authors:create' %}">Create New Author</a>
+    <ul>
+
+        <table id="myTable" class="display">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Country</th>
+                    <th>Birth Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for author in object_list %}
+                <tr>
+                    <td><a href="{% url 'authors:details' author.id %}">{{ author.first_name }} {{ author.middle_name }} {{ author.last_name }}</a></td>
+                    <td>{{ author.country }}</td>
+                    <td>{{ author.birth_date }}</td>
+                </tr>
+                {% endfor %}
+    
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Name</th>
+                    <th>Country</th>
+                    <th>Birth Date</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    {% endblock %}
+    
+    
+    
+    {% block js %}
+    <script>
+    
+    $(document).ready( function () {
+        $('#myTable').DataTable({
+            "initComplete":  function () {
+            this.api()
+                .columns()
+                .every(function () {
+                    let column = this;
+                    let title = column.footer().textContent;
+     
+                    // Create input element
+                    let input = document.createElement('input');
+                    input.placeholder = title;
+                    column.footer().replaceChildren(input);
+     
+                    // Event listener for user input
+                    input.addEventListener('keyup', () => {
+                        if (column.search() !== this.value) {
+                            column.search(input.value).draw();
+                        }
+                    });
+                });
+        }
+        });
+    } );
+    </script>
+    {% endblock %}
