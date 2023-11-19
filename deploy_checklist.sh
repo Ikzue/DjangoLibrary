@@ -6,7 +6,7 @@ python -m pip freeze > requirements.txt
 ALLOWED_HOSTS = [".herokuapp.com", "localhost", "127.0.0.1"]
 4) Create a *Procfile* (Heroku instructions) and *runtime.txt* file (Heroku python ver.)
 Procfile
-web: gunicorn django_project.wsgi --log-file -
+web: gunicorn proj.wsgi --log-file -
 
 runtime.txt
 python-3.10.2
@@ -26,6 +26,14 @@ heroku open
 heroku run bash
 # Check logs
 heroku logs --tail
+6) Install Postgre for Heroku
+# proj/settings.py
+if 'DATABASE_URL' in os.environ:
+    import dj_database_url
+    DATABASES = {'default': dj_database_url.config()}
+# requirements.txt
+dj-database-url 
+psycopg2
 
 TODO
 1) Configure static files, install whitenoise,  collectstatic

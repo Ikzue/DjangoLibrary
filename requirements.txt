@@ -4,3 +4,6 @@ pytest==7.4.3
 pytest-django==4.6.0
 django-extensions==3.2.3
 gunicorn==21.2.0
+
+dj-database-url 
+psycopg2
