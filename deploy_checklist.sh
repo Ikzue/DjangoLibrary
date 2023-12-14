@@ -1,16 +1,19 @@
-1) Install Gunicorn (or uWSGI)
-python -m pip install gunicorn==21.2.0
-2) Create *requirements.txt*
+1) Create *requirements.txt*
 python -m pip freeze > requirements.txt
-3) Update *ALLOWED_HOSTS* in django_project/settings.py (Prevent HTTP Host header attacks)
+2) Update *ALLOWED_HOSTS* in django_project/settings.py (Prevent HTTP Host header attacks)
 ALLOWED_HOSTS = [".herokuapp.com", "localhost", "127.0.0.1"]
-4) Create a *Procfile* (Heroku instructions) and *runtime.txt* file (Heroku python ver.)
+3) Create a env file, Dockerfile, docker-compose and entrypoint for dev env.
+4) Do the same for production
+
+
+: '
+3) Create a *Procfile* (Heroku instructions) and *runtime.txt* file (Heroku python ver.)
 Procfile
 web: gunicorn proj.wsgi --log-file -
 
 runtime.txt
 python-3.10.2
-5) Deploy to Heroku
+4) Deploy to Heroku
 heroku login
 # Create new app
 heroku create  # Check with git remote -v
@@ -26,7 +29,7 @@ heroku open
 heroku run bash
 # Check logs
 heroku logs --tail
-6) Install Postgre for Heroku
+5) Install Postgre for Heroku
 # proj/settings.py
 if 'DATABASE_URL' in os.environ:
     import dj_database_url
@@ -48,3 +51,4 @@ TODO
 ---
 
 https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
+'
