@@ -14,4 +14,10 @@ fi
 python manage.py flush --no-input
 python manage.py migrate
 
-exec "$@"
+echo
+
+if [ "$#" -eq 0 ]; then
+  gunicorn proj.wsgi:application --bind 0.0.0.0:$PORT
+else
+  exec "$@"
+fi
